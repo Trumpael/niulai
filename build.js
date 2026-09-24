@@ -46,4 +46,19 @@ ${bodyPart}
 `;
 
 fs.writeFileSync("index.html", out);
-console.log("index.html " + (out.length / 1024).toFixed(1) + "KB");
+
+// dist/ 是给 Cloudflare Pages 上传的产物目录：只放托管需要的文件
+fs.mkdirSync("dist", { recursive: true });
+fs.writeFileSync("dist/index.html", out);
+fs.writeFileSync(
+  "dist/_headers",
+  `/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+`
+);
+
+console.log("index.html + dist/index.html " + (out.length / 1024).toFixed(1) + "KB");
